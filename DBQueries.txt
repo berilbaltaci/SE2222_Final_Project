@@ -1,0 +1,174 @@
+
+ORDER
+--------------
+
+SELECT hospitalId FROM dbProject.`order`
+WHERE orderId=6;
+
+SELECT bloodBankId FROM dbProject.`order`
+WHERE orderId=8;
+
+SELECT name as HospitalName FROM dbProject.`order`
+JOIN Hospital ON dbProject.hospital.HospitalId=dbProject.order.HospitalId
+WHERE dbProject.order.OrderId=5;
+
+HOSPITAL
+-------------
+
+SELECT Name,phone FROM dbProject.hospital 
+WHERE phone like '111%';
+
+SELECT hospitalId as ID, Name as hospitalName, phone FROM dbProject.hospital 
+WHERE name like 'Ege%';
+
+SELECT Name as HospitalName, hospitalId as ID FROM dbProject.hospital
+WHERE address'Alsancak';
+
+SELECT Phone FROM dbProject.hospital
+WHERE hospitalId=5;
+
+PERSON
+------------------
+
+SELECT Name, Surname FROM dbProject.person 
+WHERE dateOfBirth=1997;
+
+SELECT personID, Name FROM dbProject.person 
+WHERE dateOfBirth>1995 AND Gender='F';
+
+SELECT Name, Phone, Address FROM dbProject.person 
+WHERE dateOfBirth<1995 AND dateOfBirth>1960;
+
+BLOODBANK
+--------------------
+
+SELECT BloodBankId as BBID, name FROM dbProject.bloodbank
+WHERE phone='11';
+
+SELECT Phone, address FROM dbProject.bloodbank
+WHERE name like 'Çiğli%';
+
+SELECT Name, Phone FROM dbProject.bloodbank
+WHERE name like 'Çiğli%' OR phone like '1%';
+
+SELECT bloodBankId, name as BloodBankName FROM dbProject.bloodbank
+WHERE bloodBankId>2 AND bloodbankId<8;
+
+BLOOD
+---------------------
+
+SELECT BloodId, BloodGroup, ProteinType FROM dbProject.blood
+WHERE BloodGroup='A' OR BloodGroup='B';
+
+SELECT BloodGroup, ProteinType FROM dbProject.blood
+WHERE BloodId=2;
+
+SELECT BloodId, BloodGroup FROM dbProject.blood
+WHERE ProteinType='N';
+
+SELECT BloodId FROM dbProject.blood
+WHERE BloodGroup='AB' AND ProteinType='P';
+
+QUESTIONNAIRE
+------------------------
+
+SELECT DonorID, AidsDisease FROM dbProject.questionnaire
+WHERE useDrugs=1;
+
+SELECT DonorId, Date FROM dbProject.questionnaire 
+WHERE Diabeties=1 AND CarrierOfHepatitis=1
+ORDER BY Date;
+
+SELECT DonorId, Date, SeenCancerTratment FROM dbProject.questionnaire 
+WHERE SurgeryOrEndoscopy=1 AND useMedication=0
+ORDER BY Date DESC;
+
+DONOR
+----------------------
+
+SELECT DonorId, Weight FROM dbProject.donor
+WHERE personId=2;
+
+SELECT donorId, weight FROM dbProject.donor
+WHERE weight>=75
+ORDER BY weight;
+
+SELECT EmployeeId FROM dbProject.donor
+WHERE personId=15;
+
+
+EMPLOYEE
+------------------------
+
+SELECT dbProject.person.name as EmployeeName, dbProject.person.surname as EmployeeSurname, dbProject.bloodbank.Name as BBName FROM dbProject.employee
+JOIN dbProject.bloodbank ON dbProject.employee.BloodBankId=dbProject.bloodbank.BloodBankId
+JOIN dbProject.person ON dbProject.employee.PersonId=dbProject.person.PersonId;
+
+SELECT * FROM dbProject.employee
+ORDER BY bloodbankId;
+
+SELECT EmployeeId FROM dbProject.employee
+WHERE personId=1;
+
+***************************************************************
+
+
+TRIGGER
+-------------------------------------------
+
+delimiter $$
+create trigger dateofbirthcheck
+	before insert on person
+	for each row
+		if NEW.DateOfBirth>2019 then 
+        set NEW.DateOfBirth=2018;
+        end if;
+end$$
+delimiter ;
+
+INSERT INTO dbProject.person
+VALUES(21, 'Beril', 'Bltc', '2020', 'F', 'Bornova', '123', 'berilb', 3);
+SELECT * FROM dbProject.person; 
+
+..............................................................................................................
+
+DDELIMITER  $$
+CREATE TRIGGER BloodBankTri 
+	BEFORE INSERT ON BloodBank 
+	FOR EACH ROW
+BEGIN
+SET NEW.BloodBankId=UPPER(NEW.BloodBankId);
+SET NEW.Name = UPPER(NEW.Name);
+SET NEW.Address = UPPER(NEW.Address);
+SET NEW.Phone= UPPER(NEW.Phone);
+
+END$$
+DELIMITER ;
+
+INSERT INTO dbProject.bloodbank
+VALUE(13, 'Naldöken Kan Alma Birimi', 'Naldöken', '9876');
+
+SELECT * FROM dbProject.bloodbank;
+
+
+INSERT / UPDATE / ALTER / JOIN
+------------------------------------------
+
+UPDATE Person
+SET Surname='Soysal', Address='Karşıyaka'
+WHERE PersonId=1;
+
+SELECT Name as DonorName, surname as DonorSurname, AidsDisease FROM dbProject.questionnaire 
+JOIN donor ON dbProject.questionnaire.DonorId=donor.DonorId
+JOIN person ON donor.PersonId=person.PersonId
+WHERE useDrugs=1;
+
+INSERT INTO Hospital (HospitalId, Name, Address, Phone)
+VALUES (14, 'Alsancak Diş Hastanesi', 'Alsancak','987');
+
+ALTER TABLE bloodbank MODIFY Name VARCHAR(150); 
+
+
+
+
+
